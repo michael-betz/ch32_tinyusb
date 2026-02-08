@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "py_ui_board"
+version = "0.0.1"
+dependencies = ["pyusb", "pillow", "numpy", "aggdraw"]
+
+[tool.pyright]
+reportOptionalMemberAccess = "warning"
+reportUnusedImport = "warning"
+reportUnusedClass = "warning"
+reportUnusedFunction = "warning"
+reportUnusedVariable = "warning"
+reportDuplicateImport = "error"
+reportWildcardImportFromLibrary = "error"
+
+[tool.black]
+line-length = 120

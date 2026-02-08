@@ -8,10 +8,9 @@
 
 // Endpoint Addresses
 #define EPNUM_OUT 0x01  // Host -> Device (Bulk, LEDs + Display)
-#define EPNUM_IN 0x81   // Device -> Host (Interrupt, Buttons + Encoder)
 
-// Total length: Config + Interface + 2 Endpoints
-#define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + 9 + 7 + 7)
+// Total length: Config + Interface + Bulk endpoint
+#define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + 9 + 7)
 
 //--------------------------------------------------------------------+
 // Device Descriptors
@@ -31,8 +30,8 @@ tusb_desc_device_t const desc_device = {
 
     .bMaxPacketSize0 = CFG_TUD_ENDPOINT0_SIZE,
 
-    .idVendor = 0xCAFE,   // Change to your VID
-    .idProduct = 0x0001,  // Change to your PID
+    .idVendor = 0x16c0,
+    .idProduct = 0x05dc,
     .bcdDevice = 0x0100,
 
     .iManufacturer = 0x01,
@@ -58,11 +57,6 @@ uint8_t const desc_configuration[] =
     // 3. Endpoint Descriptor (OUT - Bulk - for Display)
     // bLength, bDescriptorType, bEndpointAddress, bmAttributes, wMaxPacketSize, bInterval
     7, TUSB_DESC_ENDPOINT, EPNUM_OUT, TUSB_XFER_BULK, 64, 0,
-
-    // 4. Endpoint Descriptor (IN - Interrupt - for Encoders)
-    // bmAttributes: 0x03 = Interrupt
-    // bInterval: 10 = 10 ms polling (fastest possible is 1 ms on Full Speed)
-    7, TUSB_DESC_ENDPOINT, EPNUM_IN, TUSB_XFER_INTERRUPT, 64, 10
 };
 // clang-format on
 
@@ -88,9 +82,8 @@ enum {
 // Array of pointer to string descriptors
 char const *string_desc_arr[] = {
     (const char[]){0x09, 0x04},  // 0: is supported language is English (0x0409)
-    "Betz Engineering",          // 1: Manufacturer
+    "betz-engineering.ch",       // 1: Manufacturer
     "ui_to_usb",                 // 2: Product
-    "R-S000",                    // 3: Serials
 };
 
 static uint16_t _desc_str[32];
@@ -118,8 +111,8 @@ int ui_to_usb_get_serial(uint16_t *desc_str) {
 }
 
 // Invoked when received GET STRING DESCRIPTOR request
-// Application return pointer to descriptor, whose contents must exist long enough for transfer to
-// complete
+// Application return pointer to descriptor, whose contents must exist long
+// enough for transfer to complete
 uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
     (void)langid;
     size_t chr_count;
